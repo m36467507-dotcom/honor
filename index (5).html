@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1a0c1f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>حور | حكايتنا</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap');
+:root{
+ --ios-pink:#ff4f8b;--ios-pink2:#ff8fb3;--ios-blue:#0a84ff;
+ --label:#ffffff;--label2:#ffffffb3;--label3:#ffffff66;
+ --fill:#ffffff14;--stroke:#ffffff1f;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%}
+body{
+ font-family:'Cairo',-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,sans-serif;
+ color:var(--label);overflow-x:hidden;min-height:100svh;
+ background:#1a0c1f;
+}
+/* soft iOS-like background orbs */
+.orbs{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:linear-gradient(170deg,#2a0f2f 0%,#1a0c1f 45%,#120713 100%)}
+.orbs i{position:absolute;border-radius:50%;filter:blur(70px);opacity:.55}
+.orbs i:nth-child(1){width:55vw;height:55vw;background:#ff4f8b;top:-12vw;left:-10vw}
+.orbs i:nth-child(2){width:50vw;height:50vw;background:#7b3fd6;bottom:-14vw;right:-12vw}
+.orbs i:nth-child(3){width:30vw;height:30vw;background:#ff8fb3;top:40%;left:55%;opacity:.25}
+
+button,input{font:inherit}
+button{cursor:pointer;border:0;-webkit-appearance:none}
+
+.app{position:relative;z-index:1;min-height:100svh}
+
+/* top progress like iOS story bar */
+.bar{position:fixed;top:0;left:0;right:0;z-index:5;padding:calc(env(safe-area-inset-top) + 14px) 22px 0;display:flex;gap:6px;opacity:0;transition:opacity .4s}
+.bar.show{opacity:1}
+.bar i{flex:1;height:3px;border-radius:9px;background:#ffffff2a;overflow:hidden}
+.bar i b{display:block;height:100%;width:0;background:#fff;border-radius:9px;transition:width .6s ease}
+.bar i.done b{width:100%}
+
+.page{display:none;min-height:100svh;padding:calc(env(safe-area-inset-top) + 56px) 22px calc(env(safe-area-inset-bottom) + 40px);align-items:center;justify-content:center}
+.page.active{display:flex;animation:in .5s cubic-bezier(.2,.8,.2,1) both}
+@keyframes in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.inner{width:min(100%,540px);margin:auto;text-align:center}
+
+.chip{display:inline-block;font-size:13px;font-weight:700;color:var(--ios-pink2);background:#ff4f8b1f;border:1px solid #ff4f8b40;padding:6px 14px;border-radius:99px;letter-spacing:.2px}
+h1{font-size:clamp(40px,11vw,62px);line-height:1.2;margin:22px 0 12px;font-weight:900;letter-spacing:-.5px}
+h2{font-size:clamp(32px,8vw,44px);line-height:1.25;margin:18px 0 12px;font-weight:900;letter-spacing:-.4px}
+p{color:var(--label2);font-size:17px;line-height:1.9;margin:0;font-weight:600}
+.pink{color:var(--ios-pink2)}
+.grad{background:linear-gradient(110deg,#ffd0e0,#ff4f8b 55%,#ff8fb3);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+.big{font-size:clamp(20px,5vw,24px);line-height:2;color:#fff}
+.emoji-big{display:block;font-size:72px;margin:18px auto 4px;animation:pop 2s ease-in-out infinite}
+@keyframes pop{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+
+/* iOS grouped card */
+.group{margin-top:26px;background:#ffffff12;backdrop-filter:blur(24px) saturate(160%);-webkit-backdrop-filter:blur(24px) saturate(160%);border:1px solid var(--stroke);border-radius:26px;overflow:hidden;text-align:right}
+.row{display:flex;align-items:center;gap:12px;padding:16px 18px;font-size:17px;font-weight:700;color:#fff}
+.row+.row{border-top:1px solid #ffffff1a}
+.row .ic{font-size:24px;width:34px;text-align:center}
+.row small{display:block;font-size:13px;color:var(--label3);font-weight:600;margin-top:2px}
+
+/* entry */
+.entry{margin:34px auto 0;max-width:420px;display:flex;flex-direction:column;gap:12px}
+input{width:100%;padding:17px 18px;border:1px solid #ffffff26;background:#ffffff14;color:#fff;border-radius:18px;text-align:center;font-size:18px;font-weight:700;outline:none;transition:border-color .25s,box-shadow .25s}
+input::placeholder{color:#ffffff66;font-weight:600}
+input:focus{border-color:var(--ios-pink);box-shadow:0 0 0 4px #ff4f8b33}
+.hint{min-height:24px;color:var(--ios-pink2);font-size:14px;margin-top:12px;font-weight:700}
+.hint.shake{animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.tiny{font-size:13px;color:var(--label3);margin-top:16px;font-weight:600}
+
+/* iOS capsule buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:52px;padding:0 26px;border-radius:999px;font-size:17px;font-weight:800;color:#fff;background:linear-gradient(135deg,#ff6a9c,#ff3d7f);box-shadow:0 10px 26px #ff3d7f55;transition:transform .15s,opacity .2s}
+.btn:active{transform:scale(.96);opacity:.9}
+.btn.glass{background:#ffffff1c;box-shadow:none;border:1px solid #ffffff26;color:#fff}
+.btn.wide{width:100%}
+.actions{display:flex;gap:12px;margin-top:32px;justify-content:center;flex-wrap:wrap}
+.actions .btn{flex:1;min-width:140px;max-width:240px}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(3,1fr)}
+.stat{padding:22px 6px;text-align:center}
+.stat+.stat{border-right:1px solid #ffffff1a}
+.stat b{display:block;font-size:36px;font-weight:900;color:var(--ios-pink2);letter-spacing:-.5px}
+.stat span{font-size:13px;color:var(--label2);font-weight:700}
+
+/* gallery: iOS photo tiles */
+.gallery{display:grid;grid-template-columns:1fr;gap:16px;margin-top:26px}
+.tile{margin:0;border-radius:24px;overflow:hidden;background:#ffffff12;border:1px solid var(--stroke);box-shadow:0 18px 40px #0006;cursor:zoom-in;transition:transform .2s}
+.tile:active{transform:scale(.98)}
+.tile .frame{height:240px;display:flex;align-items:center;justify-content:center;font-size:52px;background:linear-gradient(135deg,#ff8fb3,#7b3fd6)}
+.tile img{width:100%;height:240px;object-fit:cover;display:block}
+.tile figcaption{padding:14px 16px;font-size:15px;font-weight:700;color:#fff;text-align:right}
+@media(min-width:640px){.gallery{grid-template-columns:repeat(3,1fr)}.tile .frame,.tile img{height:200px}}
+
+/* letter */
+.letter{padding:24px 22px;text-align:right;white-space:pre-line;font-size:17px;line-height:2.1;color:#fff;font-weight:600}
+.letter b{display:block;margin-top:14px;color:var(--ios-pink2);font-weight:800}
+
+/* song */
+audio{width:100%;margin:16px 0 4px;color-scheme:dark;accent-color:var(--ios-pink)}
+
+.final{font-size:90px;display:inline-block;animation:pop 2s ease-in-out infinite;filter:drop-shadow(0 0 24px #ff4f8b88)}
+
+.lb{position:fixed;inset:0;z-index:30;background:#000c;display:none;align-items:center;justify-content:center;padding:20px;cursor:zoom-out}
+.lb.on{display:flex;animation:in .3s both}
+.lb img{max-width:100%;max-height:88vh;border-radius:18px}
+
+.fall{position:fixed;z-index:10;top:-40px;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(480deg);opacity:0}}
+
+@media(max-width:420px){.actions{flex-direction:column}.actions .btn{max-width:none;width:100%}.page{padding-inline:18px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<div class="orbs" aria-hidden="true"><i></i><i></i><i></i></div>
+
+<div class="bar" id="bar">
+ <i><b></b></i><i><b></b></i><i><b></b></i><i><b></b></i><i><b></b></i>
+</div>
+
+<div class="app">
+
+<section class="page active" id="p0">
+ <div class="inner">
+  <span class="chip">11:11 · مفاجأة خاصة</span>
+  <span class="emoji-big">♡</span>
+  <h1>فيه حكاية <span class="grad">مستنياكي إنتِ</span></h1>
+  <p>حكايتنا من 3 سنين… واللي جاي أحلى بكتير.<br>يلا يا حور، اكتبي اسمك وافتحي المفاجأة 💗</p>
+  <form class="entry" id="entry">
+   <input id="name" placeholder="اكتبي اسمك هنا" autocomplete="off" aria-label="اسمك">
+   <button class="btn wide" type="submit">ابدئي المفاجأة ♥</button>
+  </form>
+  <div class="hint" id="hint"></div>
+  <div class="tiny">11 · 11 · 11:11</div>
+ </div>
+</section>
+
+<section class="page" id="p1">
+ <div class="inner">
+  <span class="chip">الفصل الأول · إنتِ</span>
+  <span class="emoji-big">💗</span>
+  <h1>يا <span class="grad">حــــور</span></h1>
+  <p class="big">أحلى حاجة حصلتلي في حياتي إنك دخلتي فيها.<br>ولو رجع بيا الزمن، هختارك تاني من غير ما أفكر ولا ثانية.</p>
+  <div class="actions"><button class="btn" onclick="go(2)">كمّلي ←</button></div>
+ </div>
+</section>
+
+<section class="page" id="p2">
+ <div class="inner">
+  <span class="chip">الفصل التاني · 3 سنين</span>
+  <h2>3 سنين من <span class="grad">الحب</span></h2>
+  <p>3 سنين عدّوا بسرعة… وكل يوم فيهم كان بيأكدلي إن وجودك جنبي أحلى حاجة في حياتي.</p>
+  <div class="group">
+   <div class="stats">
+    <div class="stat"><b data-count="3">3</b><span>سنين مع بعض</span></div>
+    <div class="stat"><b>∞</b><span>حب من غير آخر</span></div>
+    <div class="stat"><b data-count="1">1</b><span>اختياري كل يوم</span></div>
+   </div>
+  </div>
+  <div class="actions"><button class="btn glass" onclick="go(1)">رجوع</button><button class="btn" onclick="go(3)">شوفي ذكرياتنا ←</button></div>
+ </div>
+</section>
+
+<section class="page" id="p3">
+ <div class="inner">
+  <span class="chip">الفصل التالت · ذكرياتنا</span>
+  <h2>أحلى <span class="grad">ذكرياتنا</span></h2>
+  <p>كل صورة وراها حكاية… دوسي على الصورة تكبر.</p>
+  <div class="gallery">
+   <figure class="tile"><div class="frame">💗</div><img src="https://files.catbox.moe/hahs0u.jpg" alt="صورتنا الأولى" onerror="this.style.display='none'"><figcaption>ذكرى من قلبي 💗</figcaption></figure>
+   <figure class="tile"><div class="frame">✨</div><img src="https://files.catbox.moe/tco1v5.jpg" alt="ذكرى حلوة" onerror="this.style.display='none'"><figcaption>أحلى لحظاتنا ✨</figcaption></figure>
+   <figure class="tile"><div class="frame">❤️</div><img src="https://files.catbox.moe/8i3qen.jpg" alt="مع بعض" onerror="this.style.display='none'"><figcaption>والمشوار لسه مكمل ❤️</figcaption></figure>
+  </div>
+  <div class="actions"><button class="btn glass" onclick="go(2)">رجوع</button><button class="btn" onclick="go(4)">فيه رسالة ليكي ←</button></div>
+ </div>
+</section>
+
+<section class="page" id="p4">
+ <div class="inner">
+  <span class="chip">الفصل الرابع · أغنيتنا</span>
+  <h2>أغنيتنا <span class="grad">الخاصة</span> 🎵</h2>
+  <div class="group" style="padding:20px 18px;text-align:center">
+   <p>دي الأغنية اللي هتبقى جزء من مفاجأتنا.<br>دوسي تشغيل واسمعيها 🎧</p>
+   <div style="margin:18px 0;padding:18px 16px;border-radius:18px;background:#ffffff0d;color:#fff;font-size:16px;line-height:2.1;font-weight:700;white-space:normal">
+    لو الدنيا كلها وقفت قدامي<br>مش هختار غيرك يا حور<br>إنتي اللي ضحكتك مليت عليا<br>وخلتي الدنيا كلها نور 💗
+   </div>
+   <audio controls playsinline preload="metadata">
+    <source src="https://files.catbox.moe/apdmx0.mp3" type="audio/mpeg">
+    متصفحك مش بيدعم تشغيل الصوت.
+   </audio>
+   <div class="tiny" style="margin-top:6px">على الآيفون لازم تدوسي تشغيل بنفسك 💗</div>
+  </div>
+  <div class="actions"><button class="btn glass" onclick="go(3)">رجوع</button><button class="btn" onclick="go(5)">افتحي رسالتي ←</button></div>
+ </div>
+</section>
+
+<section class="page" id="p5">
+ <div class="inner">
+  <span class="chip">الفصل الخامس · من قلبي</span>
+  <h2>رسالة <span class="grad">من قلبي</span></h2>
+  <div class="group letter">يا حور…
+
+مش عارف أقولك إنتي غالية عليا قد إيه، بس أنا عارف إن 3 سنين معاكي مش مجرد وقت عدى. دول أحلى أيام وضحك وذكريات وتفاصيل مش هنساها أبدًا.
+
+مش هقولك إن كل يوم هيبقى مثالي، بس أوعدك إني هفضل أحاول عشان أشوفك مبسوطة، وأسمعك، وأكون جنبك وقت ما تحتاجيني.
+
+كل مرة 11:11 بتمنى نفس الأمنية… إننا نفضل مع بعض، وحكايتنا تكبر معانا.
+
+<b>بحبك يا حور… النهارده وبكرة وكل يوم ❤️</b></div>
+  <div class="actions"><button class="btn glass" onclick="go(4)">رجوع</button><button class="btn" onclick="go(6)">آخر مفاجأة ❤️</button></div>
+ </div>
+</section>
+
+<section class="page" id="p6">
+ <div class="inner">
+  <span class="chip">11:11 · حكايتنا للأبد</span>
+  <div class="final">❤️</div>
+  <h1>3 سنين عدّوا…<br><span class="grad">ولسه اختياري ليكي كل يوم</span></h1>
+  <p>دي مش نهاية حكايتنا، دي بس صفحة صغيرة من كتابنا، ولسه قدامنا أيام كتير نعيشها سوا.<br>بحبك يا حور ❤️</p>
+  <div class="actions"><button class="btn" id="wish">امنيه 11:11 ✨</button><button class="btn glass" onclick="go(1)">ابدئي من الأول ↻</button></div>
+ </div>
+</section>
+
+</div>
+
+<div class="lb" id="lb"><img alt=""></div>
+
+<script>
+let current=0;
+const bar=document.getElementById('bar');
+const bars=bar.querySelectorAll('i');
+
+function setBar(n){
+ bars.forEach((b,i)=>{b.classList.toggle('done',i<n)});
+}
+
+function go(n){
+ const old=document.getElementById('p'+current),next=document.getElementById('p'+n);
+ if(!next)return;
+ old.classList.remove('active');current=n;next.classList.add('active');
+ bar.classList.toggle('show',n>0);
+ setBar(n);
+ window.scrollTo({top:0,behavior:'smooth'});
+ if(n===1)celebrate(24);
+ if(n===2)countUp();
+}
+
+// name gate: ignores spaces and invisible characters, accepts حور or hoor
+document.getElementById('entry').addEventListener('submit',e=>{
+ e.preventDefault();
+ const hint=document.getElementById('hint');
+ const v=document.getElementById('name').value.replace(/[\s\u200b-\u200f\u0640]/g,'').toLowerCase();
+ if(v==='حور'||v==='hoor'){
+  hint.textContent='';
+  go(1);
+ }else{
+  hint.textContent='المفاجأة دي لحور بس… جربي تكتبي اسمك 💗';
+  hint.classList.remove('shake');void hint.offsetWidth;hint.classList.add('shake');
+ }
+});
+
+function countUp(){
+ document.querySelectorAll('[data-count]').forEach(el=>{
+  const target=+el.dataset.count;let n=0;el.textContent='0';
+  const iv=setInterval(()=>{n++;el.textContent=n;if(n>=target)clearInterval(iv)},400);
+ });
+}
+
+function celebrate(count){
+ const icons=['💗','💕','✨','❤️'];
+ for(let i=0;i<count;i++){
+  const el=document.createElement('span');
+  el.className='fall';
+  el.textContent=icons[Math.floor(Math.random()*icons.length)];
+  el.style.left=(Math.random()*100)+'vw';
+  el.style.fontSize=(14+Math.random()*18)+'px';
+  el.style.animationDuration=(3+Math.random()*3)+'s';
+  el.style.animationDelay=(Math.random()*1.2)+'s';
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),7500);
+ }
+}
+
+document.getElementById('wish').addEventListener('click',e=>{
+ celebrate(50);
+ e.currentTarget.textContent='اتحققت إن شاء الله 💫';
+});
+
+const lb=document.getElementById('lb');
+document.querySelectorAll('.tile').forEach(t=>{
+ t.addEventListener('click',()=>{
+  const img=t.querySelector('img');
+  if(!img||img.style.display==='none')return;
+  lb.querySelector('img').src=img.src;
+  lb.classList.add('on');
+ });
+});
+lb.addEventListener('click',()=>lb.classList.remove('on'));
+</script>
+</body>
+</html>
